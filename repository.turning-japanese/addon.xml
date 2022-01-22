@@ -4,9 +4,9 @@
             <import addon="xbmc.addon" version="12.0.0"/>
         </requires>
         <extension point="xbmc.addon.repository" name="Turning-Japanese Repository">
-            <info compressed="false">https://raw.githubusercontent.com/ponchofcult/Turning-Japanese/master/_repo/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/ponchofcult/Turning-Japanese/master/_repo/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/ponchofcult/Turning-Japanese/master/_repo/</datadir>
+            <info compressed="false">https://raw.githubusercontent.com/ponchofcult/Turning-Japanese-Leia/master/_repo/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/ponchofcult/Turning-Japanese-Leia/master/_repo/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/ponchofcult/Turning-Japanese-Leia/master/_repo/</datadir>
             <hashes>false</hashes>
 		<dir>
             <info compressed="false">https://raw.githubusercontent.com/Gujal00/smrzips/master/addons.xml</info>
