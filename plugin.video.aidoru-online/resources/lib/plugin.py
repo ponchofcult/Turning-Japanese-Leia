@@ -8,23 +8,40 @@ from codequick.utils import urljoin_partial, bold
 import requests
 import urlquick
 import xbmcgui
+import resolveurl
 from bs4 import BeautifulSoup as bs
 import logger #logger.debug(FUNCION O VARIABLE A DEBUGUEAR)
 import xbmc
 import os
 from time import sleep as wait
+import random
 from random import uniform
 import xbmcaddon
 import xbmcvfs
 import tools
 import urllib
 
-__addon__ = xbmcaddon.Addon()
-__addonname__ = __addon__.getAddonInfo('name')
 
 username = tools.getSetting("username")
 password = tools.getSetting("password")
 
+letras = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+numeros = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+
+characters = letras + numeros
+
+cookie = []
+
+for i in range(32):
+    caracter_random = random.choice(characters)
+    cookie.append(caracter_random)
+
+    ufp = "".join(cookie)
+
+cookie = [str(r) for r in cookie] #Para quitar las u'
+cookie = ''.join(cookie) #Para concatenar todos los elementos de la lista con un separador que elijamos entre comillas    
+cookies = 'flog=6; ufp='+ str(cookie)
+# logger.debug(cookies)
 
 URL = "https://aidoru-online.me/"
 url_constructor = urljoin_partial(URL)
@@ -46,7 +63,7 @@ HEADERS = {
     'sec-fetch-dest': 'document',
     'referer': 'https://aidoru-online.me/login.php',
     'accept-language': 'es-419,es;q=0.9,en;q=0.8',
-    'cookie': 'flog=6; ufp=t42f2c1dba83c2f57c4d3ad9d7a1d5a2',
+    'cookie': cookies,
 }
 
 params = (
@@ -65,6 +82,10 @@ response = s.post(url, headers=HEADERS, data=data)
 
 @Route.register
 def root(plugin, content_type="segment"):
+    item = Listitem()
+    item.label = "Please first enter your Username and Password in the addon settings. If you already did, ignore this message"
+    yield item
+    
     yield Listitem.search(search_Content)
     
     item = Listitem()
@@ -210,9 +231,11 @@ def all_Content(plugin, scat_url):
         thumbnails = img.find_all(class_="torrent-image")
         
         for art in fanarts:
-            item.art['fanart'] = art.get("src")
+            img_link = art.get("src").replace('640x480q90', '4032x3024q90').replace('/th/','/img/')
+            item.art['fanart'] = img_link
         for thumb in thumbnails:
-            item.art['thumb'] = thumb.get("src")
+            img_link = thumb.get("data-imgurl").replace('640x480q90', '4032x3024q90')
+            item.art['thumb'] = img_link
         item.set_callback(details_Content, url=url)
         yield item 
         
@@ -240,11 +263,13 @@ def get_Content(plugin,nextPage):
         thumbnails = img.find_all(class_="torrent-image")
         
         for art in fanarts:
-            item.art['fanart'] = art.get("src")
+            img_link = art.get("src").replace('640x480q90', '4032x3024q90').replace('/th/','/img/')
+            item.art['fanart'] = img_link
         for thumb in thumbnails:
-            item.art['thumb'] = thumb.get("src")
+            img_link = thumb.get("data-imgurl").replace('640x480q90', '4032x3024q90')
+            item.art['thumb'] = img_link
         item.set_callback(details_Content, url=url)
-        yield item 
+        yield item  
         
         
     NextPageTree = resp.find_all("p", align="center")
@@ -268,7 +293,7 @@ def details_Content(plugin,url):
     wait(a_moment)
     
     item = Listitem()
-    item.label = "PLAY"
+    item.label = "STREAM|PLAY"
     url_router = resp.find(id="ty-button")
     url = url_constructor(url_router.find_previous_sibling("div").find("a").get("href"))
     item.set_callback(play_Torrent, url=url)
@@ -278,9 +303,11 @@ def details_Content(plugin,url):
     for cover in covers:
         item = Listitem()
         item.label = "COVER" + str(counter)
-        url = cover.get("src")
-        item.art['thumb'] = cover.get("src")
-        item.art['fanart'] = cover.get("src")
+        img_link = cover.get("src").replace('640x480q90', '4032x3024q90').replace('/th/','/img/')
+        url = img_link
+        # logger.debug(url)
+        item.art['thumb'] = img_link
+        item.art['fanart'] = img_link
         item.set_callback(show_Photos, url=url)
         counter += 1
         yield item
@@ -289,23 +316,26 @@ def details_Content(plugin,url):
     for image in images:
         item = Listitem()
         item.label = "IMAGE" + str(counter)
-        url = image.get("src")
-        item.art['thumb'] = image.get("src")
-        item.art['fanart'] = image.get("src")
+        img_link = image.get("data-imgurl").replace('640x480q90', '4032x3024q90')
+        url = img_link
+        # logger.debug(url)
+        item.art['thumb'] = img_link
+        item.art['fanart'] = img_link
         item.set_callback(show_Photos, url=url)
         counter += 1
         yield item
     
-       
-@Resolver.register
+    
+@Route.register
 def play_Torrent(plugin,url):
     url_ = url_constructor(url)
     url = s.get(url_)
-    torrent_title = url.headers.get("Content-Disposition").split('filename=')[1].replace('"','')
+    video = ""
+    torrent_title = url.headers.get("Content-Disposition").split('filename=')[1].replace('"','').replace(' ','')
     logger.debug(str(torrent_title))
     
-    profile = xbmc.translatePath("special://userdata/addon_data/plugin.video.aidoru-online/").decode("utf-8") #Cambiarlo a xbmcvfs.translatePath
-    directory = "temp/"
+    profile = xbmc.translatePath("special://userdata/addon_data/plugin.video.laboratory/").decode("utf-8") #Cambiarlo a xbmcvfs.translatePath
+    directory = "temp\\"
     parent_dir = profile
     path = os.path.join(parent_dir, directory)
     try:
@@ -317,16 +347,27 @@ def play_Torrent(plugin,url):
     torrent = open(profile+directory+torrent_title, 'wb')
     torrent.write(url.content)
     torrent.close()
-    torrent_file = "file://"+profile+directory+torrent_title#.replace(' ','+')
-    # logger.debug(torrent_file)
-    xbmc.executebuiltin( "RunPlugin("+"plugin://plugin.video.torrentin/?uri=%s" % urllib.quote_plus(torrent_file) + ")" )
-    plugin = plugin.extract_source(url_)
-    return Listitem().from_dict(**{
-        "label" : "Playing",
-        "callback" : plugin,
-    }) 
+    torrent_file = profile+directory+torrent_title
+    logger.debug(torrent_file)
+    
+    if tools.getSetting("torrent_player") == "Torrentin":
+        xbmc.executebuiltin('Dialog.Close(all,true)')
+        xbmc.executebuiltin( "PlayMedia("+"plugin://plugin.video.torrentin/?uri=%s" % "file://"+( urllib.quote_plus(torrent_file, safe='') )+")" )
+        
+    elif tools.getSetting("torrent_player") == "Elementum":
+        xbmc.executebuiltin('Dialog.Close(all,true)')
+        xbmc.executebuiltin( "PlayMedia("+"plugin://plugin.video.elementum/play?uri=%s" % ( urllib.quote_plus(torrent_file, safe='') )+")" )
+         
+    elif tools.getSetting("torrent_player") == "Torrest":
+        xbmc.executebuiltin('Dialog.Close(all,true)')
+        xbmc.executebuiltin( "PlayMedia("+"plugin://plugin.video.torrest/play_path?path=%s" % ( urllib.quote_plus(torrent_file, safe='') )+")" )
+    
+    item = Listitem()
+    item.label = "Enjoy Your Video! =)"
+    yield item
+       
 
-
+    
 @Resolver.register
 def show_Photos(plugin,url):
     url = url
@@ -335,4 +376,4 @@ def show_Photos(plugin,url):
     return Listitem().from_dict(**{
         "label" : "Showing",
         "callback" : plugin,
-    })
+    })   
