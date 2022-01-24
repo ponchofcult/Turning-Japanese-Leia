@@ -9,7 +9,7 @@ import requests
 import urlquick
 import xbmcgui
 from bs4 import BeautifulSoup as bs
-import logger #logger.debug(FUNCION O VARIABLE A DEBUGUEAR)
+import logger #logger.debug(FUNCTION OR VARIABLE TO DEBUG)
 import xbmc
 import os
 from time import sleep as wait

@@ -12,7 +12,7 @@
         <provides>audio image video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">It facilitates access to the content of the aidoru-online.me page, we are not responsible for the content hosted on this website, nor do we have any relationship with it, the content is uploaded by the users of this website.</summary>
+        <summary lang="en_GB">This addon offers the access to the content of the aidoru-online.me page, we are not responsible for the content hosted on this website, nor do we have any relationship with it, the content is uploaded by the users of this website.</summary>
         <description lang="en_GB"></description>
         <language></language>
         <platform>all</platform>
