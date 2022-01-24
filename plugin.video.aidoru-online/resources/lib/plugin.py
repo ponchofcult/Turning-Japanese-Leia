@@ -8,7 +8,6 @@ from codequick.utils import urljoin_partial, bold
 import requests
 import urlquick
 import xbmcgui
-import resolveurl
 from bs4 import BeautifulSoup as bs
 import logger #logger.debug(FUNCION O VARIABLE A DEBUGUEAR)
 import xbmc
