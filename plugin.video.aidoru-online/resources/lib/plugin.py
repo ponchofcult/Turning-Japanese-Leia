@@ -333,7 +333,7 @@ def play_Torrent(plugin,url):
     torrent_title = url.headers.get("Content-Disposition").split('filename=')[1].replace('"','').replace(' ','')
     logger.debug(str(torrent_title))
     
-    profile = xbmc.translatePath("special://userdata/addon_data/plugin.video.laboratory/").decode("utf-8") #Cambiarlo a xbmcvfs.translatePath
+    profile = xbmc.translatePath("special://userdata/addon_data/plugin.video.aidoru-online/").decode("utf-8") #Cambiarlo a xbmcvfs.translatePath
     directory = "temp\\"
     parent_dir = profile
     path = os.path.join(parent_dir, directory)
